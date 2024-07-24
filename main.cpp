@@ -22,6 +22,21 @@ Grid(int x, int y) :posX(x), posY(y) {}
 //type 2 means its start
 //type 3 means its end
 };
+
+std::vector<std::vector<Grid>> grids(numOfCellX, std::vector<Grid>(numOfCellY, Grid(0, 0)));
+
+Vector2 normalise(Vector2 s, Vector2 e)
+{
+int x = s.x - e.x;
+int y = s.y - e.y;
+float mag = std::sqrt(x * x + y * y);
+return { x / mag,y / mag };
+
+
+}
+
+
+
 int main(){
 
 // Initialization
@@ -61,3 +76,73 @@ BeginDrawing();
 
 ClearBackground(BLACK);
 
+
+
+for (int i = 0; i < screenWidth; i+=cellSize) {
+for (int j = 0; j < screenHeight; j+=cellSize) {
+int mouse_x = GetMousePosition().x;
+int mouse_y = GetMousePosition().y;
+
+
+if ((mouse_x >= i && mouse_x <= i + 10) && (mouse_y >= j && mouse_y <= j + 10))
+{
+if (IsKeyDown(KEY_S)&& !setStart)
+{
+grids[i / cellSize][j / cellSize].type = 2;
+grids[i / cellSize][j / cellSize].Color = GREEN;
+startX = i ;
+startY= j ;
+setStart = 1;
+}
+
+if (IsKeyDown(KEY_E) && !setEnd)
+{
+grids[i / cellSize][j / cellSize].type = 3;
+grids[i / cellSize][j / cellSize].Color = RED;
+endX = i;
+endY = j;
+setEnd = 1;
+}
+if (IsMouseButtonDown(0)) {
+if (grids[i / cellSize][j / cellSize].type == 2) { setStart = 0; }
+if (grids[i / cellSize][j / cellSize].type == 3) { setEnd = 0; }
+
+grids[i / cellSize][j / cellSize].type = 1;
+grids[i / cellSize][j / cellSize].Color = DARKPURPLE;
+
+
+}
+if (IsMouseButtonDown(1)) {
+if (grids[i / cellSize][j / cellSize].type == 2) { setStart = 0; }
+if (grids[i / cellSize][j / cellSize].type == 3) { setEnd = 0; }
+grids[i / cellSize][j / cellSize].type = 0;
+grids[i / cellSize][j / cellSize].Color = GRAY;
+}
+}
+
+
+
+
+
+
+
+DrawRectangle(i, j, cellSize - 1, cellSize - 1,grids[i/cellSize][j/cellSize].Color);
+if(setStart && setEnd){ DrawLine(startX, startY, endX, endY, BLACK);
+}
+}
+}
+
+
+
+
+EndDrawing();
+//----------------------------------------------------------------------------------
+}
+
+// De-Initialization
+//--------------------------------------------------------------------------------------
+CloseWindow(); // Close window and OpenGL context
+//--------------------------------------------------------------------------------------
+
+return 0;
+}
